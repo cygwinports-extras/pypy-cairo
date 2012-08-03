@@ -1,0 +1,26 @@
+inherit pypy
+
+CATEGORY="Python"
+SUMMARY="PyPy cairo bindings"
+HOMEPAGE="http://cairographics.org/pycairo"
+SRC_URI="http://cairographics.org/releases/py2cairo-${PV}.tar.bz2"
+SRC_DIR="py2cairo-${PV}"
+
+DISTCLEANFILES="config.log config.lt config.status libtool *.pc"
+
+pypy_cairo_CONTENTS="${PYPY_SITELIB#/}/ usr/share/doc/"
+PKG_IGNORE="usr/include/ usr/lib/pkgconfig/"
+
+MAKEOPTS+=" pyexecdir=${PYPY_SITELIB}"
+
+src_compile() {
+	local soext=$(${PYPY} -c 'import imp; print imp.get_suffixes()[0][0]')
+	cd ${S}
+	cygautoreconf
+	cd ${B}
+	cygconf PYTHON=${PYPY}
+	cygmake LIBS="-no-undefined -shrext ${soext} ${LIBPYPY}"
+}
+
+DOCS="COPYING-LGPL-2.1 COPYING-MPL-1.1"
+KEEP_LA_FILES="none"
